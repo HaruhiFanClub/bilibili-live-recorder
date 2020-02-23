@@ -18,21 +18,22 @@ class BiliBiliLiveRecorder(BiliBiliLive):
         self.check_interval = check_interval
 
     def check(self, interval):
-        while True:
-            self.print(self.room_id, "Checking...")
-            try:
-                room_info = self.get_room_info()
-                if room_info['status']:
-                    self.inform(room_id=self.room_id,desp=room_info['roomname'])
-                    self.print(self.room_id, room_info['roomname'])
-                    break
-                else:
-                    self.print(self.room_id, '等待开播')
-            except Exception as e:
-                self.print(self.room_id, 'Error:' + str(e))
-            time.sleep(interval)
-        return self.get_live_urls()
+        self.print(self.room_id, "Checking...")
+        try:
+            room_info = self.get_room_info()
+            if room_info['status']:
+                return True, room_info
+                #self.inform(room_id=self.room_id,desp=room_info['roomname'])
+                #self.print(self.room_id, room_info['roomname'])
+                #break
+            else:
+                return False, None
+                #self.print(self.room_id, '等待开播')
+        except Exception as e:
+            self.print(self.room_id, 'Error:' + str(e))
+            return False, None
 
+    
     def record(self, record_url, output_filename):
         try:
             self.print(self.room_id, '正在录制...' + self.room_id)
@@ -44,13 +45,24 @@ class BiliBiliLiveRecorder(BiliBiliLive):
     def run(self):
         while True:
             try:
-                urls = self.check(interval=self.check_interval)
+                status, info = self.check(interval=self.check_interval)
+                if not status:
+                    self.print(room_id=self.room_id, content='Not Broadcasting...')
+                    time.sleep(self.check_interval)
+                    continue
+                self.print(room_id=self.room_id, content='Start Broadcasting!')
+                self.inform(text=f"{self.room_id}开播了", desp=info['roomname'])
+
+                time.sleep(1.5)
+                urls = self.get_live_urls()
                 filename = utils.generate_filename(self.room_id)
                 c_filename = os.path.join(os.getcwd(), 'files', filename)
                 self.record(urls[0], c_filename)
                 self.print(self.room_id, '录制完成' + c_filename)
+                self.inform(text=f"{self.room_id}录制结束", desp="")
             except Exception as e:
                 self.print(self.room_id, 'Error while checking or recording:' + str(e))
+                self.inform(text=f"Error!", desp=str(e))
 
 
 if __name__ == '__main__':
