@@ -32,8 +32,6 @@ class BiliBiliLive():
         response = self.common_request('GET', room_info_url, {'room_id': self.room_id}).json()
         if response['msg'] == 'ok':
             data['roomname'] = response['data']['title']
-            data['site_name'] = self.site_name
-            data['site_domain'] = self.site_domain
             data['status'] = response['data']['live_status'] == 1
         self.room_id = str(response['data']['room_id'])  # 解析完整 room_id
         response = self.common_request('GET', user_info_url, {'roomid': self.room_id}).json()
@@ -50,8 +48,7 @@ class BiliBiliLive():
             'platform': 'h5'
         }).json()
         time.sleep(1.3)
-        #if stream_info['code'] is not 0:
-        if True:
+        if stream_info['code'] is not 0:
             print("Old api Request Failed, get live_urls from web")
             print(f'https://live.bilibili.com/{self.room_id}')
             self.session = requests.session()
@@ -66,6 +63,10 @@ class BiliBiliLive():
             data = script.text.replace("window.__NEPTUNE_IS_MY_WAIFU__=","")
             js_data = json.loads(data)
             print(js_data)
+            if js_data['roomInitRes']['data']['play_url'] is None:
+                print("get failed")
+                time.sleep(3)
+                return self.get_live_urls()
             for durl in js_data['roomInitRes']['data']['play_url']['durl']:
                 live_urls.append(durl['url'])
             print(live_urls)
