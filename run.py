@@ -50,11 +50,14 @@ class BiliBiliLiveRecorder(BiliBiliLive):
                     self.print(room_id=self.room_id, content='Not Broadcasting...')
                     time.sleep(self.check_interval)
                     continue
+
                 self.print(room_id=self.room_id, content='Start Broadcasting!')
                 self.inform(text=f"{self.room_id}开播了", desp=info['roomname'])
 
                 time.sleep(1.5)
                 urls = self.get_live_urls()
+                time.sleep(1.5)
+
                 filename = utils.generate_filename(self.room_id)
                 c_filename = os.path.join(os.getcwd(), 'files', filename)
                 self.record(urls[0], c_filename)
@@ -62,6 +65,7 @@ class BiliBiliLiveRecorder(BiliBiliLive):
                 self.inform(text=f"{self.room_id}录制结束", desp="")
             except Exception as e:
                 self.print(self.room_id, 'Error while checking or recording:' + str(e))
+                print(e.with_traceback())
                 self.inform(text=f"Error!", desp=str(e))
 
 

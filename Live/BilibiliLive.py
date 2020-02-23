@@ -30,14 +30,14 @@ class BiliBiliLive(BaseLive):
             'cid': self.room_id,
             'otype': 'json',
             'quality': 0,
-            'platform': 'web'
+            'platform': 'h5'
         }).json()
         best_quality=stream_info['data']['accept_quality'][0][0]
         stream_info = self.common_request('GET', url, {
             'cid': self.room_id,
             'otype': 'json',
             'quality': best_quality,
-            'platform': 'web'
+            'platform': 'h5'
         }).json()
         for durl in stream_info['data']['durl']:
             live_urls.append(durl['url'])
