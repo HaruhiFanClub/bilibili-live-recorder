@@ -1,4 +1,4 @@
-from Live import BiliBiliLive
+from BilibiliLive import BiliBiliLive
 import os, sys
 import requests
 import time
@@ -19,6 +19,7 @@ class BiliBiliLiveRecorder(BiliBiliLive):
         self.inform = utils.inform
         self.print = utils.print_log
         self.check_interval = check_interval
+        self.room_id=room_id
 
     def check(self, interval):
         self.print(self.room_id, "Checking...")
@@ -26,12 +27,8 @@ class BiliBiliLiveRecorder(BiliBiliLive):
             room_info = self.get_room_info()
             if room_info['status']:
                 return True, room_info
-                #self.inform(room_id=self.room_id,desp=room_info['roomname'])
-                #self.print(self.room_id, room_info['roomname'])
-                #break
             else:
                 return False, None
-                #self.print(self.room_id, '等待开播')
         except Exception as e:
             self.print(self.room_id, 'Error:' + str(e))
             return False, None
@@ -53,7 +50,7 @@ class BiliBiliLiveRecorder(BiliBiliLive):
                     self.print(room_id=self.room_id, content='Not Broadcasting...')
                     time.sleep(self.check_interval)
                     continue
-
+                print(self.room_id)
                 self.print(room_id=self.room_id, content='Start Broadcasting!')
                 self.inform(text=f"{self.room_id}开播了", desp=info['roomname'])
 
@@ -77,9 +74,9 @@ if __name__ == '__main__':
     if len(sys.argv) == 2:
         room_id = str(sys.argv[1])
     elif len(sys.argv) == 1:
-        room_id = config.room  # input_id = '917766' '1075'
+        room_id = config.room
     else:
         raise RuntimeError('请检查输入的命令是否正确 例如：python3 run.py 10086')
     room_id='1314'
-    BiliBiliLiveRecorder(room_id, check_interval=3*60).run()
+    BiliBiliLiveRecorder('1314', check_interval=3*60).run()
     
