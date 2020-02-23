@@ -19,6 +19,7 @@ class BiliBiliLiveRecorder(BiliBiliLive):
 
     def check(self, interval):
         while True:
+            self.print(self.room_id, "Checking...")
             try:
                 room_info = self.get_room_info()
                 if room_info['status']:
@@ -55,9 +56,9 @@ class BiliBiliLiveRecorder(BiliBiliLive):
 if __name__ == '__main__':
     print(sys.argv)
     if len(sys.argv) == 2:
-        room_id = [str(sys.argv[1])]
+        room_id = str(sys.argv[1])
     elif len(sys.argv) == 1:
-        input_id = config.rooms  # input_id = '917766' '1075'
+        room_id = config.room  # input_id = '917766' '1075'
     else:
         raise RuntimeError('请检查输入的命令是否正确 例如：python3 run.py 10086')
     BiliBiliLiveRecorder(room_id, check_interval=3*60).run()
