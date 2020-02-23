@@ -59,6 +59,7 @@ class BiliBiliLive():
             self.common_request('GET', "https://live.bilibili.com/")
             time.sleep(1)
             web = self.common_request('GET', f'https://live.bilibili.com/{self.room_id}').text
+            print(web)
             
             soup = BeautifulSoup(web, "html.parser") 
             script = soup.find("script", text=lambda text: text and 'window.__NEPTUNE_IS_MY_WAIFU__={"roomInitRes":' in text) 
@@ -68,6 +69,7 @@ class BiliBiliLive():
             print(js_data)
             for durl in js_data['roomInitRes']['data']['play_url']['durl']:
                 live_urls.append(durl['url'])
+            print(live_urls)
             return live_urls
         best_quality=stream_info['data']['accept_quality'][0][0]
         stream_info = self.common_request('GET', url, {
