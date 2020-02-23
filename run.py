@@ -7,6 +7,9 @@ import utils
 import re
 import multiprocessing
 import urllib3
+import traceback
+
+
 urllib3.disable_warnings()
 
 
@@ -65,7 +68,7 @@ class BiliBiliLiveRecorder(BiliBiliLive):
                 self.inform(text=f"{self.room_id}录制结束", desp="")
             except Exception as e:
                 self.print(self.room_id, 'Error while checking or recording:' + str(e))
-                print(e.with_traceback())
+                traceback.print_exc()
                 self.inform(text=f"Error!", desp=str(e))
 
 
