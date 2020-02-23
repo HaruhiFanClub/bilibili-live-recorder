@@ -14,8 +14,6 @@ class BiliBiliLive():
                           'Chrome/59.0.3071.116 Safari/537.36 '
         }
         self.session = requests.session()
-        self.site_name = ''
-        self.site_domain = ''
         self.room_id = room_id
 
     def common_request(self, method, url, params=None, data=None):
@@ -56,11 +54,12 @@ class BiliBiliLive():
         if True:
             print("Old api Request Failed, get live_urls from web")
             print(f'https://live.bilibili.com/{self.room_id}')
+            self.session = requests.session()
             self.common_request('GET', "https://live.bilibili.com/")
             time.sleep(1)
             web = self.common_request('GET', f'https://live.bilibili.com/{self.room_id}').text
             print(web)
-            
+
             soup = BeautifulSoup(web, "html.parser") 
             script = soup.find("script", text=lambda text: text and 'window.__NEPTUNE_IS_MY_WAIFU__={"roomInitRes":' in text) 
             print(script.text)
