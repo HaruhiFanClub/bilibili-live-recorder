@@ -1,0 +1,7 @@
+__pycache__
+.idea
+*.flv
+config.py
+run.bat
+.DS_Store
+files/*
