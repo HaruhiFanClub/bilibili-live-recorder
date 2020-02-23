@@ -1,5 +1,5 @@
 from .BaseLive import BaseLive
-
+import time
 
 class BiliBiliLive(BaseLive):
     def __init__(self, room_id):
@@ -32,6 +32,8 @@ class BiliBiliLive(BaseLive):
             'quality': 0,
             'platform': 'h5'
         }).json()
+        print(stream_info)
+        time.sleep(1.3)
         best_quality=stream_info['data']['accept_quality'][0][0]
         stream_info = self.common_request('GET', url, {
             'cid': self.room_id,
