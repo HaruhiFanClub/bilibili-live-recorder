@@ -80,5 +80,6 @@ if __name__ == '__main__':
         room_id = config.room  # input_id = '917766' '1075'
     else:
         raise RuntimeError('请检查输入的命令是否正确 例如：python3 run.py 10086')
+    room_id='1314'
     BiliBiliLiveRecorder(room_id, check_interval=3*60).run()
     
