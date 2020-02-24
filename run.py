@@ -50,7 +50,7 @@ class BiliBiliLiveRecorder(BiliBiliLive):
                     self.print(room_id=self.room_id, content='Not Broadcasting...')
                     time.sleep(self.check_interval)
                     continue
-                print(self.room_id)
+                
                 self.print(room_id=self.room_id, content='Start Broadcasting!')
                 self.inform(text=f"{self.room_id}开播了", desp=info['roomname'])
 

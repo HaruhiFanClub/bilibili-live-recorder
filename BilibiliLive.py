@@ -48,18 +48,17 @@ class BiliBiliLive():
             'platform': 'h5'
         }).json()
         time.sleep(1.3)
-        if stream_info['code'] is not 0:
+        #if stream_info['code'] is not 0:
+        if True:
             print("Old api Request Failed, get live_urls from web")
             print(f'https://live.bilibili.com/{self.room_id}')
             self.session = requests.session()
             self.common_request('GET', "https://live.bilibili.com/")
             time.sleep(1)
             web = self.common_request('GET', f'https://live.bilibili.com/{self.room_id}').text
-            print(web)
 
             soup = BeautifulSoup(web, "html.parser") 
             script = soup.find("script", text=lambda text: text and 'window.__NEPTUNE_IS_MY_WAIFU__={"roomInitRes":' in text) 
-            print(script.text)
             data = script.text.replace("window.__NEPTUNE_IS_MY_WAIFU__=","")
             js_data = json.loads(data)
             print(js_data)
@@ -69,7 +68,6 @@ class BiliBiliLive():
                 return self.get_live_urls()
             for durl in js_data['roomInitRes']['data']['play_url']['durl']:
                 live_urls.append(durl['url'])
-            print(live_urls)
             return live_urls
         best_quality=stream_info['data']['accept_quality'][0][0]
         stream_info = self.common_request('GET', url, {
