@@ -13,7 +13,7 @@ def generate_filename(room_id):
     data = dict()
     data['c_time'] = get_current_time('%Y%m%d_%H%M')
     data['room_id'] = room_id
-    return '_'.join(data.values()) + '.flv'
+    return '_'.join(data.values())
 
 
 def inform(text, desp):

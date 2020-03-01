@@ -5,7 +5,7 @@ import requests
 
 
 class BiliBiliLive():
-    def __init__(self, room_id):
+    def __init__(self, room_id, proxy=None):
         self.headers = {
             'Accept-Encoding': 'gzip, deflate',
             'Accept-Language': 'zh-CN,zh;q=0.8,en-US;q=0.6,en;q=0.4,zh-TW;q=0.2',
@@ -15,13 +15,26 @@ class BiliBiliLive():
         }
         self.session = requests.session()
         self.room_id = room_id
+        if proxy:
+            self.is_proxy = True
+            self.proxy = {
+                "http": proxy,
+                'https': proxy
+            }
+        else:
+            self.is_proxy = False
 
-    def common_request(self, method, url, params=None, data=None):
+
+    def common_request(self, method, url, params=None, data=None, proxy=False):
         connection = None
+        proxies = None
+        if proxy and self.is_proxy:
+            proxies = self.proxy
+            print("using proxy!" + self.proxy['http'])
         if method == 'GET':
-            connection = self.session.get(url, headers=self.headers, params=params, verify=False)
+            connection = self.session.get(url, headers=self.headers, params=params, verify=False, proxies=proxies)
         if method == 'POST':
-            connection = self.session.post(url, headers=self.headers, params=params, data=data, verify=False)
+            connection = self.session.post(url, headers=self.headers, params=params, data=data, verify=False, proxies=proxies)
         return connection
 
 
@@ -38,7 +51,7 @@ class BiliBiliLive():
         data['hostname'] = response['data']['info']['uname']
         return data
 
-    def get_live_urls(self):
+    def get_live_urls_byapi(self):
         live_urls = []
         url = 'https://api.live.bilibili.com/room/v1/Room/playUrl'
         stream_info = self.common_request('GET', url, {
@@ -46,36 +59,38 @@ class BiliBiliLive():
             'otype': 'json',
             'quality': 0,
             'platform': 'h5'
-        }).json()
-        time.sleep(1.3)
-        #if stream_info['code'] is not 0:
-        if True:
-            print("Old api Request Failed, get live_urls from web")
-            print(f'https://live.bilibili.com/{self.room_id}')
-            self.session = requests.session()
-            self.common_request('GET', "https://live.bilibili.com/")
-            time.sleep(1)
-            web = self.common_request('GET', f'https://live.bilibili.com/{self.room_id}').text
-
-            soup = BeautifulSoup(web, "html.parser") 
-            script = soup.find("script", text=lambda text: text and 'window.__NEPTUNE_IS_MY_WAIFU__={"roomInitRes":' in text) 
-            data = script.text.replace("window.__NEPTUNE_IS_MY_WAIFU__=","")
-            js_data = json.loads(data)
-            print(js_data)
-            if js_data['roomInitRes']['data']['play_url'] is None:
-                print("get failed")
-                time.sleep(3)
-                return self.get_live_urls()
-            for durl in js_data['roomInitRes']['data']['play_url']['durl']:
-                live_urls.append(durl['url'])
-            return live_urls
+        }, proxy=True).json()
+        time.sleep(1)
+        print(stream_info)
+        print()
+        if stream_info['code'] is not 0:
+            return False, None
         best_quality=stream_info['data']['accept_quality'][0][0]
         stream_info = self.common_request('GET', url, {
             'cid': self.room_id,
             'otype': 'json',
             'quality': best_quality,
             'platform': 'h5'
-        }).json()
+        }, proxy=True).json()
         for durl in stream_info['data']['durl']:
             live_urls.append(durl['url'])
-        return live_urls
+        return True, live_urls
+
+
+    def get_live_urls_byweb(self):
+        print("get live_urls from web and use proxy if enabled")
+        print(f'https://live.bilibili.com/{self.room_id}')
+        web = self.common_request('GET', f'https://live.bilibili.com/{self.room_id}', proxy=True).text
+
+        soup = BeautifulSoup(web, "html.parser") 
+        script = soup.find("script", text=lambda text: text and 'window.__NEPTUNE_IS_MY_WAIFU__={"roomInitRes":' in text) 
+        data = script.text.replace("window.__NEPTUNE_IS_MY_WAIFU__=","")
+        js_data = json.loads(data)
+        print(js_data)
+        if js_data['roomInitRes']['data']['play_url'] is None:
+            print("get from web failed")
+            return False, None
+        live_urls = []
+        for durl in js_data['roomInitRes']['data']['play_url']['durl']:
+            live_urls.append(durl['url'])
+        return True, live_urls
