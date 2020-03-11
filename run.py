@@ -131,5 +131,5 @@ if __name__ == '__main__':
         proxy = config.proxy
     else:
         proxy = None
-    BiliBiliLiveRecorder(room_id, check_interval=1*60, proxy=proxy, use_option_link=config.use_option_link).run()
+    BiliBiliLiveRecorder(room_id, check_interval=0.5*60, proxy=proxy, use_option_link=config.use_option_link).run()
     
